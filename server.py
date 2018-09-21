@@ -16,7 +16,7 @@ def sync_file_to_consul(path, consul_client):
             if '=' in line:
                 key, value = line.split('=')
                 value = value.strip('\n')
-                consul_key = path.replace(REPOS_ROOT, '').lstrip('/').rstrip('.env') + '/' + key
+                consul_key = path.replace(REPOS_ROOT, '').lstrip('/').replace('.env', '') + '/' + key
                 APP.logger.info('key: %s \tvalue: %s', consul_key, value)
                 consul_client.kv.put(consul_key, value)
 
@@ -32,7 +32,6 @@ def sync_repo_to_consul(repo_dir):
     for root, _, files in os.walk(repo_dir):
         for _file in files:
             if _file.endswith('.env'):
-                # sync content to consul
                 sync_file_to_consul(root + '/' + _file, consul_client)
 
 def get_changes(ssh_url, commit, repo_dir):
